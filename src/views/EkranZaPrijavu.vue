@@ -1,8 +1,15 @@
 <script setup>
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore()
 
 const email = ref('')
 const lozinka = ref('')
+
+const prijava = () => {
+  authStore.prijaviTrenera(email.value, lozinka.value)
+}
 
 </script>
 
@@ -17,14 +24,14 @@ const lozinka = ref('')
 
       <h1 class="text-white text-3xl font-bold text-center mb-6 -mt-1.25"> Prijava Trenera </h1>
 
-      <form @submit.prevent class="space-y-6 w-full px-14">
+      <form @submit.prevent="prijava" class="space-y-6 w-full px-14">
         <div class="flex gap-4">
-          <input type="email" placeholder="E-mail"
+          <input v-model="email" type="email" placeholder="E-mail"
             class=" w-full bg-fill2 border border-stroke rounded-xl px-4 py-4 text-white" text-lg>
         </div>
 
         <div class="flex gap-4">
-          <input type="password" placeholder="Lozinka"
+          <input v-model="lozinka" type="password" placeholder="Lozinka"
             class=" w-full bg-fill2 border border-stroke rounded-xl px-4 py-4 text-white text-lg">
         </div>
 

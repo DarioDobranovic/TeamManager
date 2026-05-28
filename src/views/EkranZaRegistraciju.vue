@@ -1,10 +1,18 @@
 <script setup>
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
 
 const ime = ref('')
 const prezime = ref('')
 const email = ref('')
 const lozinka = ref('')
+
+const authStore = useAuthStore()
+
+const registracija = () => {
+  authStore.registrirajTrenera(email.value, lozinka.value)
+}
 
 </script>
 
@@ -19,21 +27,23 @@ const lozinka = ref('')
 
       <h1 class="text-white text-3xl font-bold text-center mb-6 -mt-1.25"> Registracija Trenera </h1>
 
-      <form @submit.prevent class="space-y-4">
+      <form @submit.prevent="registracija" class="space-y-4">
         <div class="flex gap-4">
-          <input type="text" placeholder="Ime"
+
+          <input v-model="ime" type="text" placeholder="Ime"
             class=" w-1/2 bg-fill2 border border-stroke rounded-xl px-4 py-3 text-white">
-          <input type="text" placeholder="Prezime"
+
+          <input v-model="prezime" type="text" placeholder="Prezime"
             class=" w-1/2 bg-fill2 border border-stroke rounded-xl px-4 py-3 text-white">
         </div>
 
         <div class="flex gap-4">
-          <input type="email" placeholder="E-mail"
+          <input v-model="email" type="email" placeholder="E-mail"
             class=" w-full bg-fill2 border border-stroke rounded-xl px-4 py-3 text-white">
         </div>
 
         <div class="flex gap-4">
-          <input type="password" placeholder="Lozinka"
+          <input v-model="lozinka" type="password" placeholder="Lozinka"
             class=" w-full bg-fill2 border border-stroke rounded-xl px-4 py-3 text-white">
         </div>
 
@@ -41,6 +51,10 @@ const lozinka = ref('')
         <button type="submit"
           class="w-full bg-zuta text-black font-bold py-3 rounded-xl cursor-pointer hover:opacity-90 transition-opacity mt-2">Napravi
           Račun</button>
+
+        <div v-if="authStore.errorMessage" class="text-center text-sm font-medium mt-2">
+          <span :class="authStore.isError ? 'text-rose-600' : 'text-emerald-600'">{{ authStore.errorMessage }}</span>
+        </div>
 
         <div class="text-center mt-4">
           <RouterLink to="/" class="text-zuta text-sm font-medium hover:opacity-90 cursor-pointer">Imaš račun?

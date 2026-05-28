@@ -14,7 +14,7 @@ const prijava = () => {
 </script>
 
 <template>
-  <div class="min-h-screen w-full bg-black flex justify-center items-center p-4">
+  <div class="min-h-screen w-full  flex justify-center items-center p-4">
 
     `Glavni pravokutnik`
     <div

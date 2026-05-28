@@ -40,6 +40,10 @@ const prijava = () => {
           class="w-full bg-zuta text-black font-bold py-4 rounded-xl cursor-pointer hover:opacity-90 transition-opacity mt-2">Prijavi
           se</button>
 
+        <div v-if="authStore.errorMessage" class="text-center text-sm font-medium mt-2">
+          <span :class="authStore.isError ? 'text-rose-600' : 'text-emerald-600'">{{ authStore.errorMessage }}</span>
+        </div>
+
         <div class="text-center mt-4">
           <RouterLink to="/registracija" class="text-zuta text-sm font-medium hover:opacity-90 cursor-pointer">Nemaš
             račun? registriraj se </RouterLink>

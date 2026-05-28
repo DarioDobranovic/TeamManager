@@ -23,6 +23,10 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       isError.value = true
       errorMessage.value = 'Greška prilikom registracije' + error.message
+      setTimeout(() => {
+        errorMessage.value = ''
+        isError.value = false
+      }, 3500)
     }
   }
 
@@ -38,6 +42,10 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       isError.value = true
       errorMessage.value = 'Greška prilikom prijavljivanja: ' + error.message
+      setTimeout(() => {
+        errorMessage.value = ''
+        isError.value = false
+      }, 3500)
     }
   }
 

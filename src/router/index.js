@@ -25,4 +25,14 @@ const router = createRouter({
   ],
 })
 
+import { useAuthStore } from '@/stores/auth'
+
+router.beforeEach((to) => {
+  const authStore = useAuthStore()
+
+  if (to.path === '/sastav' && !authStore.user) {
+    return '/'
+  }
+})
+
 export default router

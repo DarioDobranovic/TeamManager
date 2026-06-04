@@ -39,7 +39,7 @@ const logout = () => {
         {{ authStore.user?.displayName }}
       </span>
       <form @submit.prevent="logout">
-        <button type="submit" class="border border-red-950 bg-red-950 text-red-400 text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer
+        <button type="submit" class="border border-red-600 bg-red-950 text-red-400 text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer
           hover:bg-red-900 hover:text-red-100 ">
           Odjavi se
         </button>

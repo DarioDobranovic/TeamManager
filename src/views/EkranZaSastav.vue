@@ -5,19 +5,32 @@ import { useDataStore } from '@/stores/dataStore';
 const dataStore = useDataStore()
 
 
-const formacije = [
-  { ime: '4-3-3', raspored: [3, 3, 4] },
-  { ime: '4-4-2', raspored: [2, 4, 4] },
-  { ime: '4-2-3-1', raspored: [1, 3, 2, 4] },
-  { ime: '4-5-1', raspored: [1, 5, 4] },
-]
 
-const trenutnaFormacija = ref(formacije[0])
+const trenutnaFormacija = ref(dataStore.formacije[0])
+const postava = computed(() => trenutnaFormacija.value.postava)
 
 const linijeTerena = computed(() => trenutnaFormacija.value.raspored)
 
-const aktivniIgraci = computed(() => {
-  return dataStore.igraci.filter(function (igrac) { return igrac.status !== 'ozlijeden' })
+const dostupniIgraci = computed(() => {
+  return dataStore.igraci.filter(function (igrac) {
+    if (igrac.status === 'ozlijeden') {
+      return false
+    }
+    let vecNaTerenu = false
+
+    for (let linija in trenutnaFormacija.value.postava) {
+      for (let pozicija in trenutnaFormacija.value.postava[linija]) {
+        let trenutniIgracNaTerenu =
+          trenutnaFormacija.value.postava[linija][pozicija]
+
+        if (trenutniIgracNaTerenu && trenutniIgracNaTerenu.id === igrac.id) {
+          vecNaTerenu = true
+        }
+      }
+    }
+
+    return vecNaTerenu == false
+  })
 })
 
 
@@ -26,12 +39,34 @@ const odabranaPozicija = ref(null)
 const prikaziIzborIgraca = ref(false)
 
 
-function otvoriIzborIgrača(id) {
-  odabranaPozicija.value = id
+function otvoriIzborIgrača(linijaIndex, igracIndex) {
+  odabranaPozicija.value = { linija: linijaIndex, pozicija: igracIndex }
   prikaziIzborIgraca.value = true
 }
 
+function postaviIgracaNaPoziciju(igrac) {
+  if (odabranaPozicija.value) {
+    const linija = odabranaPozicija.value.linija
+    const pozicija = odabranaPozicija.value.pozicija
 
+    if (!trenutnaFormacija.value.postava[linija]) {
+      trenutnaFormacija.value.postava[linija] = {}
+    }
+
+    trenutnaFormacija.value.postava[linija][pozicija] = igrac
+    prikaziIzborIgraca.value = false
+  }
+}
+
+function ukloniIgracaSaPozicije() {
+  if (odabranaPozicija.value) {
+    const linija = odabranaPozicija.value.linija
+    const pozicija = odabranaPozicija.value.pozicija
+
+    trenutnaFormacija.value.postava[linija][pozicija] = null
+    prikaziIzborIgraca.value = false
+  }
+}
 
 </script>
 
@@ -54,18 +89,54 @@ function otvoriIzborIgrača(id) {
           Formacija
         </label>
         <select id="select" v-model="trenutnaFormacija" class="font-bold text-white bg-black cursor-pointer">
-          <option :key="formacija" v-for="formacija in formacije" :value="formacija">{{ formacija.ime }}</option>
+          <option :key="formacija" v-for="formacija in dataStore.formacije" :value="formacija">{{ formacija.ime }}
+          </option>
         </select>
       </div>
-
-      <button type="button" class="bg-zuta text-black font-bold rounded-md p-1 hover:opacity-90 mr-5">
-        Spremi Sastav
-      </button>
     </div>
   </div>
 
 
   <div class="relative w-290 h-160 border-2 border-stroke rounded-2xl mx-auto mt-12 p-3">
+
+    <div v-if="prikaziIzborIgraca"
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-fill border-2 border-gray-700 w-160 h-125 rounded-xl flex flex-col gap-2">
+      <h1 class="text-white text-3xl font-bold text-center mb-6 mt-6">
+        Postavi igrača na poziciju
+      </h1>
+
+      <div
+        class="flex-1 overflow-y-auto px-4 py-2 pb-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+
+        <div class="flex flex-col gap-2">
+
+          <button v-for="(igrac, i) in dostupniIgraci" :key="igrac.id" @click="postaviIgracaNaPoziciju(igrac)"
+            class="w-full text-left text-gray-300 font-bold bg-fill2 p-3 border-3 rounded-md border-stroke cursor-pointer hover:bg-gray-800 hover:text-white">
+            #{{ i + 1 }} {{ igrac.ime }} {{ igrac.prezime }}
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="flex-none flex flex-row gap-4 pl-5 pr-5 mt-3 mb-5">
+
+        <button @click="ukloniIgracaSaPozicije" class="w-1/2 border border-red-600 bg-red-950 text-red-400 text-lg font-bold px-4 py-1  cursor-pointer
+      hover:bg-red-900 hover:text-red-100">
+          Ukloni igrača s ove pozicije
+        </button>
+
+        <button @click="prikaziIzborIgraca = false"
+          class="w-1/2 border border-gray-400 bg-fill2 text-white text-lg font-bold px-4 py-1 cursor-pointer hover:text-tekst1">
+          Zatvori
+        </button>
+
+      </div>
+    </div>
+
+
+
+
 
     <img src="@/assets/teren.png" class="w-full h-full" />
 
@@ -76,17 +147,38 @@ function otvoriIzborIgrača(id) {
         <div v-for="igrac in brojIgraca" :key="igrac"
           class="flex flex-col items-center border-3 border-gray-400 rounded-full">
 
-          <div class="w-23 h-23 bg-fill flex flex-col rounded-full items-center justify-center cursor-pointer">
-            <span class="text-white text-xs font-bold text-center p-1">Dodaj igrača</span>
+          <div @click="otvoriIzborIgrača(i, igrac)"
+            class="w-23 h-23 bg-fill flex flex-col rounded-full items-center justify-center cursor-pointer">
+
+            <div class="flex flex-col justify-center items-center" v-if="postava[i]?.[igrac]">
+              <span class="text-zuta text-xl font-bold">
+                {{ postava[i][igrac].dres }}
+              </span>
+              <span class="text-white text-xs font-bold uppercase text-center px-1 mt-0.5">
+                {{ postava[i][igrac].prezime }}
+              </span>
+            </div>
+            <span v-else class="text-white text-xs font-bold text-center p-1">
+              Dodaj igrača
+            </span>
           </div>
         </div>
 
       </div>
 
       <div class="h-1/5 w-full flex justify-around items-center pb-6">
-        <div class="flex flex-col items-center border-3 border-gray-400 rounded-full">
+        <div @click="otvoriIzborIgrača('golman', 0)"
+          class="flex flex-col items-center border-3 border-gray-400 rounded-full">
           <div class="w-23 h-23 bg-fill flex flex-col rounded-full items-center justify-center cursor-pointer">
-            <span class="text-white text-xs font-bold text-center p-1">Dodaj igrača</span>
+            <div v-if="postava['golman']?.[0]" class="flex flex-col justify-center items-center">
+              <span class="text-zuta text-xl font-bold">
+                {{ postava['golman'][0].dres }}
+              </span>
+              <span class="text-white text-xs font-bold uppercase text-center px-1 mt-0.5">
+                {{ postava['golman'][0].prezime }}
+              </span>
+            </div>
+            <span v-else class="text-white text-xs font-bold text-center p-1">Dodaj igrača</span>
           </div>
         </div>
       </div>
@@ -94,33 +186,6 @@ function otvoriIzborIgrača(id) {
     </div>
 
   </div>
-
-
-  <div class=" bg-fill border-2 border-stroke w-160 h-125 rounded-xl flex flex-col">
-    <h1 class="text-white text-3xl font-bold text-center mb-6 mt-6"> Postavi igrača na poziciju </h1>
-
-    <div class="flex flex-col gap-2 px-4 py-2 curso">
-
-      <button v-for="igrac in aktivniIgraci" :key="igrac.id"
-        class="w-full text-left text-white bg-black p-3 border border-stroke">
-        #{{ igrac.dres }} {{ igrac.ime }} {{ igrac.prezime }}
-      </button>
-
-    </div>
-
-    <div class="flex flex-row gap-4 pl-5 pr-5">
-
-      <button class=" w-1/2 border border-red-600 bg-red-950 text-red-400 text-lg font-bold px-4 py-2 cursor-pointer
-          hover:bg-red-900 hover:text-red-100 ">
-        Ukloni igrača s ove pozicije
-      </button>
-
-      <button
-        class=" w-1/2 border border-gray-400 bg-fill2 text-white text-lg font-bold px-4 py-2 cursor-pointer hover:text-tekst1 ">Zatvori</button>
-    </div>
-  </div>
-
-
 
 
 </template>

@@ -197,7 +197,16 @@ export const useDataStore = defineStore('data', () => {
     },
   ])
 
+  const formacije = [
+    { ime: '4-3-3', raspored: [3, 3, 4], postava: {} },
+    { ime: '4-4-2', raspored: [2, 4, 4], postava: {} },
+    { ime: '4-2-3-1', raspored: [1, 3, 2, 4], postava: {} },
+    { ime: '4-5-1', raspored: [1, 5, 4], postava: {} },
+    { ime: '3-4-3', raspored: [3, 4, 3], postava: {} },
+  ]
+
   return {
     igraci,
+    formacije,
   }
 })

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { auth } from '@/firebase'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -49,5 +49,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, errorMessage, isError, registrirajTrenera, prijaviTrenera }
+  async function odjaviTrenera() {
+    try {
+      await signOut(auth)
+      user.value = null
+      isError.value = false
+      errorMessage.value = ''
+
+      router.push('/')
+    } catch (error) {
+      isError.value = true
+      errorMessage.value = 'Greška prilikom odjave: ' + error.message
+      setTimeout(() => {
+        errorMessage.value = ''
+        isError.value = false
+      }, 3500)
+    }
+  }
+
+  return { user, errorMessage, isError, registrirajTrenera, prijaviTrenera, odjaviTrenera }
 })

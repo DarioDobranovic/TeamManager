@@ -10,7 +10,8 @@ const logout = () => {
 </script>
 
 <template>
-  <header class="w-full bg-fill border-b-2 border-stroke px-6 py-3 flex items-center justify-between">
+  <header v-if="authStore.user"
+    class="w-full bg-fill border-b-2 border-stroke px-6 py-3 flex items-center justify-between">
 
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-tekst1 text-xs">
@@ -20,17 +21,46 @@ const logout = () => {
     </div>
     <nav class="flex items-center gap-6">
       <RouterLink to="/sastav" class="text-tekst1 font-bold hover:text-white text-sm cursor-pointer"
-        active-class="text-zuta">Sastav</RouterLink>
+        active-class="text-zuta">
+        <div class="flex flex-row items-center gap-2">
+          <img src=" @/assets/sastav.png" class="w-5 h-5" />
+          Sastav
+        </div>
+      </RouterLink>
+
+
       <RouterLink to="/igraci" class="text-tekst1 font-bold hover:text-white text-sm cursor-pointer"
-        active-class="text-zuta">Igrači</RouterLink>
+        active-class="text-zuta">
+        <div class="flex flex-row items-center gap-2">
+          <img src=" @/assets/igraci.png" class="w-5 h-5" />
+          Igrači
+        </div>
+      </RouterLink>
+
+
       <RouterLink to="/utakmice" class="text-tekst1 font-bold hover:text-white text-sm cursor-pointer"
-        active-class="text-zuta">Utakmice
+        active-class="text-zuta">
+        <div class="flex flex-row items-center gap-2">
+          <img src=" @/assets/utakmice.png" class="w-5 h-5" />
+          Utakmice
+        </div>
       </RouterLink>
+
       <RouterLink to="/treninzi" class="text-tekst1 font-bold hover:text-white text-sm cursor-pointer"
-        active-class="text-zuta">Treninzi
+        active-class="text-zuta">
+        <div class="flex flex-row items-center gap-2">
+          <img src=" @/assets/treninzi.png" class="w-5 h-5" />
+          Treninzi
+        </div>
       </RouterLink>
+
+
       <RouterLink to="/analitika" class="text-tekst1 font-bold hover:text-white text-sm cursor-pointer"
-        active-class="text-zuta">Analitika
+        active-class="text-zuta">
+        <div class="flex flex-row items-center gap-2">
+          <img src="@/assets/analitika.png" class="w-5 h-5" />
+          <span>Analitika</span>
+        </div>
       </RouterLink>
     </nav>
 

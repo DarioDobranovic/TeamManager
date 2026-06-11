@@ -74,7 +74,7 @@ function spremiUtakmicu() {
   const ocjeneIgraca = []
 
   for (let i = 0; i < dataStore.igraci.length; i++) {
-    if (i < 5) {
+    if (i < 11) {
       const novaOcjena = Math.floor(Math.random() * 51 + 50) / 10
 
       ocjeneIgraca.push({
@@ -163,6 +163,8 @@ function obrisiUtakmicu(id) {
           </h2>
         </div>
 
+
+
         <div class="mx-16 mb-12 bg-fill2 border border-stroke rounded-xl overflow-hidden">
           <div class="px-4 py-3 border-b border-stroke">
             <p class="text-tekst1 text-sm font-bold">
@@ -170,15 +172,17 @@ function obrisiUtakmicu(id) {
             </p>
           </div>
 
-          <div v-for="ocjenaIgraca in utakmica.ocjeneIgraca" :key="ocjenaIgraca.id"
-            class="flex justify-between px-12 py-3 border-b border-stroke text-sm font-bold">
-            <p class="text-tekst1">
-              {{ ocjenaIgraca.ime }} {{ ocjenaIgraca.prezime }}
-            </p>
+          <div class="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+            <div v-for="ocjenaIgraca in utakmica.ocjeneIgraca" :key="ocjenaIgraca.id"
+              class="flex justify-between px-12 py-3 border-b border-stroke text-sm font-bold last:border-b-0">
+              <p class="text-tekst1">
+                {{ ocjenaIgraca.ime }} {{ ocjenaIgraca.prezime }}
+              </p>
 
-            <p class="text-zuta">
-              {{ ocjenaIgraca.ocjena }}
-            </p>
+              <p class="text-zuta">
+                {{ ocjenaIgraca.ocjena }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

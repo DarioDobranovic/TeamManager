@@ -3,165 +3,99 @@ import { computed } from 'vue'
 import { useDataStore } from '@/stores/dataStore'
 
 const dataStore = useDataStore()
-
-const igraciZaAnalitiku = computed(() => {
-  if (!dataStore.igraci) {
-    return []
-  }
-
-  return dataStore.igraci
-})
-
-const utakmiceZaAnalitiku = computed(() => {
-  if (!dataStore.utakmice) {
-    return []
-  }
-
-  return dataStore.utakmice
-})
-
 const ukupanBrojIgraca = computed(() => {
-  return igraciZaAnalitiku.value.length
+
+  return dataStore.igraci.length
+
 })
 
 const ukupnaVrijednostIgraca = computed(() => {
   let zbrojVrijednostiIgraca = 0
+  dataStore.igraci.forEach(function (igrac) {
 
-  igraciZaAnalitiku.value.forEach(function (igrac) {
-    zbrojVrijednostiIgraca += pretvoriVrijednostUBroj(igrac.vrijednost)
+    zbrojVrijednostiIgraca += igrac.vrijednost
   })
-
   return zbrojVrijednostiIgraca
 })
 
 const ukupanBrojOzlijedenihIgraca = computed(() => {
   let brojOzlijedenihIgraca = 0
 
-  igraciZaAnalitiku.value.forEach(function (igrac) {
-    const statusIgraca = String(igrac.status).toLowerCase()
+  dataStore.igraci.forEach(function (igrac) {
+    const statusIgraca = igrac.status.toLowerCase()
 
-    if (statusIgraca.includes('ozlij') || statusIgraca.includes('ozlje')) {
+    if (statusIgraca.includes('ozlijeden')) {
       brojOzlijedenihIgraca++
     }
   })
-
   return brojOzlijedenihIgraca
 })
 
 const ukupanBrojOdigranihUtakmica = computed(() => {
-  return utakmiceZaAnalitiku.value.length
+  return dataStore.utakmice.length
 })
 
 const brojPobjeda = computed(() => {
-  let brojPobjedaKluba = 0
-
-  utakmiceZaAnalitiku.value.forEach(function (utakmica) {
-    const brojZabijenihGolova = pretvoriVrijednostUBroj(utakmica.zabiliSmo)
-    const brojPrimljenihGolova = pretvoriVrijednostUBroj(utakmica.primiliSmo)
-
-    if (brojZabijenihGolova > brojPrimljenihGolova) {
-      brojPobjedaKluba++
-    }
+  let brojac = 0
+  dataStore.utakmice.forEach(function (utakmica) {
+    if (utakmica.nasiGolovi > utakmica.protivnickiGolovi) brojac++
   })
-
-  return brojPobjedaKluba
+  return brojac
 })
 
 const brojRemija = computed(() => {
-  let brojRemijaKluba = 0
-
-  utakmiceZaAnalitiku.value.forEach(function (utakmica) {
-    const brojZabijenihGolova = pretvoriVrijednostUBroj(utakmica.zabiliSmo)
-    const brojPrimljenihGolova = pretvoriVrijednostUBroj(utakmica.primiliSmo)
-
-    if (brojZabijenihGolova === brojPrimljenihGolova) {
-      brojRemijaKluba++
-    }
+  let brojac = 0
+  dataStore.utakmice.forEach(function (utakmica) {
+    if (utakmica.nasiGolovi === utakmica.protivnickiGolovi) brojac++
   })
-
-  return brojRemijaKluba
+  return brojac
 })
 
 const brojPoraza = computed(() => {
-  let brojPorazaKluba = 0
+  let brojac = 0
+  dataStore.utakmice.forEach(function (utakmica) {
+    if (utakmica.nasiGolovi < utakmica.protivnickiGolovi) brojac++
+  })
+  return brojac
+})
 
-  utakmiceZaAnalitiku.value.forEach(function (utakmica) {
-    const brojZabijenihGolova = pretvoriVrijednostUBroj(utakmica.zabiliSmo)
-    const brojPrimljenihGolova = pretvoriVrijednostUBroj(utakmica.primiliSmo)
+const najboljiStrijelac = computed(() => {
+  let najbolji = null
+  let najviseGolova = 0
 
-    if (brojZabijenihGolova < brojPrimljenihGolova) {
-      brojPorazaKluba++
+  dataStore.igraci.forEach(function (igrac) {
+    if (igrac.golovi > najviseGolova) {
+      najviseGolova = igrac.golovi
+      najbolji = igrac
     }
   })
 
-  return brojPorazaKluba
+  if (najbolji && najviseGolova > 0) {
+    return najbolji.ime + ' ' + najbolji.prezime + ' (' + najviseGolova + ')'
+  }
+  return 'Nema golova'
 })
 
-const tekstNajboljegStrijelca = computed(() => {
-  const najboljiIgrac = dohvatiNajboljegIgracaPremaPolju('golovi')
 
-  if (!najboljiIgrac) {
-    return 'Nema (0)'
-  }
+const najboljiAsistent = computed(() => {
+  let najbolji = null
+  let najviseAsistencija = 0
 
-  return najboljiIgrac.prezime + ' (' + pretvoriVrijednostUBroj(najboljiIgrac.golovi) + ')'
-})
-
-const tekstNajboljegAsistenta = computed(() => {
-  const najboljiIgrac = dohvatiNajboljegIgracaPremaPolju('asistencije')
-
-  if (!najboljiIgrac) {
-    return 'Nema (0)'
-  }
-
-  return najboljiIgrac.prezime + ' (' + pretvoriVrijednostUBroj(najboljiIgrac.asistencije) + ')'
-})
-
-function dohvatiNajboljegIgracaPremaPolju(nazivPolja) {
-  if (igraciZaAnalitiku.value.length === 0) {
-    return null
-  }
-
-  let najboljiIgrac = igraciZaAnalitiku.value[0]
-
-  igraciZaAnalitiku.value.forEach(function (igrac) {
-    const trenutnaVrijednost = pretvoriVrijednostUBroj(igrac[nazivPolja])
-    const najboljaVrijednost = pretvoriVrijednostUBroj(najboljiIgrac[nazivPolja])
-
-    if (trenutnaVrijednost > najboljaVrijednost) {
-      najboljiIgrac = igrac
+  dataStore.igraci.forEach(function (igrac) {
+    if (igrac.asistencije > najviseAsistencija) {
+      najviseAsistencija = igrac.asistencije
+      najbolji = igrac
     }
   })
 
-  return najboljiIgrac
-}
-
-function pretvoriVrijednostUBroj(vrijednost) {
-  if (vrijednost === '' || vrijednost === null || vrijednost === undefined) {
-    return 0
+  if (najbolji && najviseAsistencija > 0) {
+    return najbolji.ime + ' ' + najbolji.prezime + ' (' + najviseAsistencija + ')'
   }
+  return 'Nema asistencija'
+})
 
-  return Number(vrijednost)
-}
-
-function formatirajVelikiBroj(vrijednost) {
-  const tekstVrijednosti = String(vrijednost)
-  let formatiranaVrijednost = ''
-  let brojacZnamenki = 0
-
-  for (let indeks = tekstVrijednosti.length - 1; indeks >= 0; indeks--) {
-    formatiranaVrijednost = tekstVrijednosti[indeks] + formatiranaVrijednost
-    brojacZnamenki++
-
-    if (brojacZnamenki === 3 && indeks !== 0) {
-      formatiranaVrijednost = ' ' + formatiranaVrijednost
-      brojacZnamenki = 0
-    }
-  }
-
-  return formatiranaVrijednost
-}
 </script>
+
 
 <template>
   <div class="w-full max-w-294 mx-auto mt-18">
@@ -180,7 +114,7 @@ function formatirajVelikiBroj(vrijednost) {
           Vrijednost igrača
         </p>
         <p class="text-zelena text-3xl font-bold leading-none mt-2">
-          {{ formatirajVelikiBroj(ukupnaVrijednostIgraca) }} €
+          {{ ukupnaVrijednostIgraca }} €
         </p>
       </div>
 
@@ -254,7 +188,7 @@ function formatirajVelikiBroj(vrijednost) {
               Najbolji Strijelac:
             </p>
             <p class="text-zuta text-xl font-bold text-right">
-              {{ tekstNajboljegStrijelca }}
+              {{ najboljiStrijelac }}
             </p>
           </div>
 
@@ -263,7 +197,7 @@ function formatirajVelikiBroj(vrijednost) {
               Najbolji Asistent:
             </p>
             <p class="text-zuta text-xl font-bold text-right">
-              {{ tekstNajboljegAsistenta }}
+              {{ najboljiAsistent }}
             </p>
           </div>
         </div>

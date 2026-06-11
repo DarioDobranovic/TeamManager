@@ -8,7 +8,7 @@ const route = useRoute()
 <template>
   <div class="min-h-screen bg-black flex flex-col">
 
-    <TheHeader v-if="route.path !== '/' && route - path !== '/registracija'" />
+    <TheHeader v-if="route.path !== '/' && route.path !== '/registracija'" />
 
     <RouterView />
   </div>

@@ -11,7 +11,7 @@ const lozinka = ref('')
 const authStore = useAuthStore()
 
 const registracija = () => {
-  authStore.registrirajTrenera(email.value, lozinka.value)
+  authStore.registrirajTrenera(email.value, lozinka.value, ime.value, prezime.value)
 }
 
 </script>

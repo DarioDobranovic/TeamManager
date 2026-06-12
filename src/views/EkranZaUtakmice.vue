@@ -54,7 +54,7 @@ function zatvoriFormuZaUtakmicu() {
   }
 }
 
-function spremiUtakmicu() {
+async function spremiUtakmicu() {
   if (utakmicaForma.value.nasiGolovi < 0) {
     utakmicaForma.value.nasiGolovi = 0
   }
@@ -97,14 +97,16 @@ function spremiUtakmicu() {
   }
 
   dataStore.utakmice.push(novaUtakmica)
+  await dataStore.spremiPodatke()
 
   zatvoriFormuZaUtakmicu()
 }
 
-function obrisiUtakmicu(id) {
+async function obrisiUtakmicu(id) {
   for (let i = 0; i < dataStore.utakmice.length; i++) {
     if (dataStore.utakmice[i].id === id) {
       dataStore.utakmice.splice(i, 1)
+      await dataStore.spremiPodatke()
     }
   }
 }

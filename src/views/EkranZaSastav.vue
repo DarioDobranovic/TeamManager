@@ -44,7 +44,7 @@ function otvoriIzborIgrača(linijaIndex, igracIndex) {
   prikaziIzborIgraca.value = true
 }
 
-function postaviIgracaNaPoziciju(igrac) {
+async function postaviIgracaNaPoziciju(igrac) {
   if (odabranaPozicija.value) {
     const linija = odabranaPozicija.value.linija
     const pozicija = odabranaPozicija.value.pozicija
@@ -54,16 +54,18 @@ function postaviIgracaNaPoziciju(igrac) {
     }
 
     trenutnaFormacija.value.postava[linija][pozicija] = igrac
+    await dataStore.spremiPodatke()
     prikaziIzborIgraca.value = false
   }
 }
 
-function ukloniIgracaSaPozicije() {
+async function ukloniIgracaSaPozicije() {
   if (odabranaPozicija.value) {
     const linija = odabranaPozicija.value.linija
     const pozicija = odabranaPozicija.value.pozicija
 
     trenutnaFormacija.value.postava[linija][pozicija] = null
+    await dataStore.spremiPodatke()
     prikaziIzborIgraca.value = false
   }
 }

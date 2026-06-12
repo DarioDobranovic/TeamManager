@@ -42,7 +42,7 @@ function zatvoriFormuZaTrening() {
   }
 }
 
-function spremiTrening() {
+async function spremiTrening() {
   if (treningForma.value.trajanjeTreninga < 0) {
     treningForma.value.trajanjeTreninga = 0
   }
@@ -63,14 +63,16 @@ function spremiTrening() {
   }
 
   dataStore.treninzi.push(noviTrening)
+  await dataStore.spremiPodatke()
 
   zatvoriFormuZaTrening()
 }
 
-function obrisiTrening(id) {
+async function obrisiTrening(id) {
   for (let i = 0; i < dataStore.treninzi.length; i++) {
     if (dataStore.treninzi[i].id === id) {
       dataStore.treninzi.splice(i, 1)
+      await dataStore.spremiPodatke()
     }
   }
 }

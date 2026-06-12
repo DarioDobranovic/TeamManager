@@ -89,7 +89,7 @@ function zatvoriFormuZaIgraca() {
   }
 }
 
-function spremiIgraca() {
+async function spremiIgraca() {
   const igracZaSpremanje = {
     id: igracForma.value.id,
     dres: igracForma.value.dres,
@@ -122,13 +122,15 @@ function spremiIgraca() {
     dataStore.igraci.push(igracZaSpremanje)
   }
 
+  await dataStore.spremiPodatke()
   zatvoriFormuZaIgraca()
 }
 
-function obrisiIgraca(id) {
+async function obrisiIgraca(id) {
   for (let i = 0; i < dataStore.igraci.length; i++) {
     if (dataStore.igraci[i].id === id) {
       dataStore.igraci.splice(i, 1)
+      await dataStore.spremiPodatke()
     }
   }
 }
@@ -233,7 +235,7 @@ function obrisiIgraca(id) {
             </div>
 
             <div class="flex-1 text-right text-white">
-              <div class="flex justify-end items-center gap-2 ml-20">
+              <div class="flex justify-end items-center gap-2 ml-18">
                 <button @click="otvoriFormuZaUredivanjeIgraca(igrac)" class="cursor-pointer hover:opacity-75">
                   <img src="@/assets/uredi.png" alt="Uredi" class="w-12 h-5 object-contain">
                 </button>

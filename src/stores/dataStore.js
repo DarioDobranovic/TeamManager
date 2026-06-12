@@ -1,203 +1,55 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { auth, db } from '@/firebase'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 
 export const useDataStore = defineStore('data', () => {
-  const igraci = ref([
-    {
-      id: 1,
-      dres: 10,
-      ime: 'Luka',
-      prezime: 'Modrić',
-      pozicija: 'Vezni',
-      godine: 40,
-      vrijednost: 6000000,
-      status: 'aktivan',
-      golovi: 5,
-      asistencije: 8,
-    },
-    {
-      id: 2,
-      dres: 1,
-      ime: 'Dominik',
-      prezime: 'Livaković',
-      pozicija: 'Golman',
-      godine: 31,
-      vrijednost: 12000000,
-      status: 'aktivan',
-      golovi: 0,
-      asistencije: 0,
-    },
-    {
-      id: 3,
-      dres: 4,
-      ime: 'Joško',
-      prezime: 'Gvardiol',
-      pozicija: 'Branič',
-      godine: 24,
-      vrijednost: 75000000,
-      status: 'aktivan',
-      golovi: 2,
-      asistencije: 3,
-    },
-    {
-      id: 4,
-      dres: 6,
-      ime: 'Josip',
-      prezime: 'Šutalo',
-      pozicija: 'Branič',
-      godine: 26,
-      vrijednost: 15000000,
-      status: 'aktivan',
-      golovi: 1,
-      asistencije: 0,
-    },
-    {
-      id: 5,
-      dres: 2,
-      ime: 'Josip',
-      prezime: 'Stanišić',
-      pozicija: 'Branič',
-      godine: 26,
-      vrijednost: 18000000,
-      status: 'ozlijeden',
-      golovi: 1,
-      asistencije: 2,
-    },
-    {
-      id: 6,
-      dres: 8,
-      ime: 'Mateo',
-      prezime: 'Kovačić',
-      pozicija: 'Vezni',
-      godine: 32,
-      vrijednost: 30000000,
-      status: 'aktivan',
-      golovi: 3,
-      asistencije: 5,
-    },
-    {
-      id: 7,
-      dres: 14,
-      ime: 'Ivan',
-      prezime: 'Perišić',
-      pozicija: 'Napadač',
-      godine: 37,
-      vrijednost: 4000000,
-      status: 'aktivan',
-      golovi: 4,
-      asistencije: 6,
-    },
-    {
-      id: 8,
-      dres: 9,
-      ime: 'Andrej',
-      prezime: 'Kramarić',
-      pozicija: 'Napadač',
-      godine: 34,
-      vrijednost: 5000000,
-      status: 'aktivan',
-      golovi: 8,
-      asistencije: 3,
-    },
-    {
-      id: 9,
-      dres: 3,
-      ime: 'Borna',
-      prezime: 'Sosa',
-      pozicija: 'Branič',
-      godine: 28,
-      vrijednost: 8000000,
-      status: 'aktivan',
-      golovi: 0,
-      asistencije: 4,
-    },
-    {
-      id: 10,
-      dres: 11,
-      ime: 'Marcelo',
-      prezime: 'Brozović',
-      pozicija: 'Vezni',
-      godine: 33,
-      vrijednost: 15000000,
-      status: 'aktivan',
-      golovi: 2,
-      asistencije: 2,
-    },
-    {
-      id: 11,
-      dres: 15,
-      ime: 'Mario',
-      prezime: 'Pašalić',
-      pozicija: 'Napadač',
-      godine: 31,
-      vrijednost: 13000000,
-      status: 'aktivan',
-      golovi: 6,
-      asistencije: 4,
-    },
-    {
-      id: 12,
-      dres: 12,
-      ime: 'Nediljko',
-      prezime: 'Labrović',
-      pozicija: 'Golman',
-      godine: 26,
-      vrijednost: 3000000,
-      status: 'aktivan',
-      golovi: 0,
-      asistencije: 0,
-    },
-    {
-      id: 13,
-      dres: 5,
-      ime: 'Martin',
-      prezime: 'Erlić',
-      pozicija: 'Branič',
-      godine: 28,
-      vrijednost: 4000000,
-      status: 'ozlijeden',
-      golovi: 0,
-      asistencije: 0,
-    },
-    {
-      id: 14,
-      dres: 7,
-      ime: 'Lovro',
-      prezime: 'Majer',
-      pozicija: 'Vezni',
-      godine: 28,
-      vrijednost: 20000000,
-      status: 'aktivan',
-      golovi: 3,
-      asistencije: 3,
-    },
-    {
-      id: 15,
-      dres: 16,
-      ime: 'Ante',
-      prezime: 'Budimir',
-      pozicija: 'Napadač',
-      godine: 34,
-      vrijednost: 5000000,
-      status: 'aktivan',
-      golovi: 10,
-      asistencije: 1,
-    },
-    {
-      id: 16,
-      dres: 17,
-      ime: 'Bruno',
-      prezime: 'Petković',
-      pozicija: 'Napadač',
-      godine: 31,
-      vrijednost: 5000000,
-      status: 'aktivan',
-      golovi: 7,
-      asistencije: 5,
-    },
+  const igraci = ref([])
+
+  const formacije = ref([
+    { ime: '4-3-3', raspored: [3, 3, 4], postava: {} },
+    { ime: '4-4-2', raspored: [2, 4, 4], postava: {} },
+    { ime: '4-2-3-1', raspored: [1, 3, 2, 4], postava: {} },
+    { ime: '4-5-1', raspored: [1, 5, 4], postava: {} },
+    { ime: '3-4-3', raspored: [3, 4, 3], postava: {} },
   ])
 
-  const formacije = [
+  const treninzi = ref([])
+
+  const utakmice = ref([])
+
+  async function spremiPodatke() {
+    const dokument = doc(db, 'treneri', auth.currentUser.uid)
+
+    await setDoc(dokument, {
+      igraci: igraci.value,
+      formacije: formacije.value,
+      treninzi: treninzi.value,
+      utakmice: utakmice.value,
+    })
+  }
+
+  async function dohvatiPodatke() {
+  const dokument = doc(db, 'treneri', auth.currentUser.uid)
+  const spremljeniDokument = await getDoc(dokument)
+
+  if (spremljeniDokument.exists()) {
+    const spremljeniPodaci = spremljeniDokument.data()
+
+    igraci.value = spremljeniPodaci.igraci
+    formacije.value = spremljeniPodaci.formacije
+    treninzi.value = spremljeniPodaci.treninzi
+    utakmice.value = spremljeniPodaci.utakmice
+  } else {
+    ocistiPodatke()
+    await spremiPodatke()
+  }
+}
+
+  function ocistiPodatke() {
+  igraci.value = []
+
+  formacije.value = [
     { ime: '4-3-3', raspored: [3, 3, 4], postava: {} },
     { ime: '4-4-2', raspored: [2, 4, 4], postava: {} },
     { ime: '4-2-3-1', raspored: [1, 3, 2, 4], postava: {} },
@@ -205,14 +57,17 @@ export const useDataStore = defineStore('data', () => {
     { ime: '3-4-3', raspored: [3, 4, 3], postava: {} },
   ]
 
-const treninzi = ref([])
-
-const utakmice = ref([])
+  treninzi.value = []
+  utakmice.value = []
+}
 
   return {
     igraci,
     formacije,
     treninzi,
     utakmice,
+    spremiPodatke,
+    dohvatiPodatke,
+    ocistiPodatke,
   }
 })
